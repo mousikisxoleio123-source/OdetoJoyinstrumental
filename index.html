@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Μουσική Ορχήστρα - Επιλογή Συσκευής</title>
+    <title>Μουσική Ορχήστρα - Πλήρης Έκδοση</title>
     <style>
         :root {
             --primary-color: #3c5aa6;
@@ -13,121 +13,158 @@
 
         body {
             font-family: 'Segoe UI', sans-serif;
-            margin: 0; 
-            min-height: 100vh;
+            margin: 0; height: 100vh;
             display: flex; flex-direction: column; align-items: center;
+            padding: 5px; overflow: hidden;
             background: #000;
-            overflow-x: hidden;
         }
 
-        /* --- DEVICE SELECTION SCREEN (Η ΦΟΡΜΑ) --- */
-        #selection-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
-            z-index: 6000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: white;
-            text-align: center;
-        }
-
-        .selection-logo { width: 80%; max-width: 300px; margin-bottom: 30px; }
-        
-        .selection-container {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 40px;
-            border-radius: 25px;
-            border: 1px solid var(--primary-color);
-            backdrop-filter: blur(10px);
-            display: flex; flex-direction: column; gap: 15px;
-            width: 85%; max-width: 400px;
-        }
-
-        .device-btn {
-            padding: 15px;
-            border-radius: 15px;
-            border: 2px solid white;
-            background: transparent;
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .device-btn:hover {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
-            transform: scale(1.05);
-        }
-
-        /* --- BACKGROUND & SPLASH --- */
         body::before {
             content: ""; 
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background-image: url('photos/unnamed.jpg'); 
-            background-size: cover; background-position: center; 
-            z-index: -2; transition: opacity 0.3s;
+            background-size: cover;
+            background-position: center; 
+            z-index: -2;
+            transition: opacity 0.3s;
         }
 
-        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        .logo-container { text-align: center; z-index: 5002; width: 80%; }
-        .main-logo { width: 100%; max-width: 400px; height: auto; }
-        .logo-ypotitlos { width: 70%; max-width: 300px; height: auto; margin-top: 2vh; }
+        body.hide-main-bg::before { opacity: 0; }
+
+        /* MODALS */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 8000; backdrop-filter: blur(10px); }
+        .modal-overlay.active { display: flex; }
+        .info-container { background: rgba(255, 255, 255, 0.1); border: 2px solid var(--primary-color); border-radius: 20px; width: 80%; max-width: 600px; padding: 20px; color: white; text-align: center; }
+        .close-info-btn { background: var(--error-color); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 15px; }
+
+        /* VIDEO EXPLORER */
+        #video-explorer-container {
+            width: 98%;
+            max-width: 1100px;
+            margin: 30px auto;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 20px;
+            border-radius: 25px;
+            border: 3px solid var(--primary-color);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            transform-origin: center center;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        @keyframes scaleUpLanding {
+            0% { opacity: 0; transform: scale(0) translateY(100px); filter: blur(10px); }
+            70% { opacity: 1; transform: scale(1.05) translateY(-10px); filter: blur(0); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        #explorer-iframe { 
+            width: 100%; 
+            aspect-ratio: 16 / 9; 
+            border-radius: 15px; 
+            border: 1px solid #444; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .close-inline-video { 
+            align-self: flex-end; 
+            background: var(--error-color); 
+            color: white; 
+            border: none; 
+            padding: 8px 20px; 
+            cursor: pointer; 
+            border-radius: 10px; 
+            margin-bottom: 12px; 
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .close-inline-video:hover { transform: scale(1.1); }
+
+        /* SPLASH SCREEN */
+        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .logo-container { display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5002; position: relative; }
+        .main-logo { width: 350px; height: auto; margin-bottom: 20px; }
+        .logo-ypotitlos { width: 280px; height: auto; }
         #intro-video { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 5001; }
-        #enter-app-button { position: absolute; bottom: 5vh; right: 5vw; z-index: 5005; width: 100px; cursor: pointer; opacity: 0; transition: 0.8s; }
+        #enter-app-button { position: absolute; bottom: 40px; right: 50px; z-index: 5005; width: 100px; cursor: pointer; opacity: 0; transition: 0.8s; }
+        .show-klik { opacity: 1 !important; transform: scale(1.1); }
 
-        /* --- MAIN UI & GRIDS --- */
-        #main-content { display: none; width: 100%; flex-direction: column; align-items: center; }
-        .nav-menu { margin: 2vh 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; background: white; padding: 10px; border-radius: 50px; z-index: 1000; }
-        .nav-btn { padding: 8px 18px; border-radius: 20px; border: none; font-weight: bold; color: var(--primary-color); cursor: pointer; }
+        /* MAIN APP */
+        #main-content { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; position: relative; z-index: 100; }
+        .visible-app { display: flex !important; }
+        .nav-menu { margin: 10px 0; display: flex; gap: 10px; background: white; padding: 8px 20px; border-radius: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000; }
+        .nav-btn { padding: 8px 18px; border-radius: 20px; border: none; background: #f8f9fa; cursor: pointer; font-weight: bold; color: var(--primary-color); transition: 0.3s; }
         .nav-btn.active { color: white; background: var(--primary-color); }
+        section { width: 100%; flex: 1; display: flex; flex-direction: column; align-items: center; overflow-y: auto; }
 
-        #explore-grid {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 4%; width: 90%; max-width: 1200px; justify-items: center; padding: 3% 2%;
-        }
-
+        /* GRIDS & BUTTONS */
         .instrument-button { 
-            background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 15%; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            padding: 5%; cursor: pointer; backdrop-filter: blur(8px); transition: 0.3s; width: 100%; aspect-ratio: 1/1;
+            background: rgba(0, 0, 0, 0.4); 
+            border: 2px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 10px; 
+            cursor: pointer; 
+            backdrop-filter: blur(8px); 
+            transition: 0.3s; 
         }
 
-        .instrument-name { color: white; font-weight: bold; margin-top: 5%; font-size: clamp(12px, 1vw, 15px); }
-
-        /* --- MATCH SECTION --- */
-        #match-section { background-image: url('photosbox/spilia.jpg') !important; background-size: cover; min-height: 100vh; position: relative; padding-top: 80px; width: 100%; }
-        .category-area { display: flex; flex-direction: column; width: 95%; margin: 0 auto; gap: 20px; }
-        @media (min-width: 768px) { .category-area { flex-direction: row; height: 70vh; } }
+        #explore-grid .instrument-button:hover { background: rgba(60, 90, 166, 0.3); transform: translateY(-5px); }
+        #explore-grid .instrument-button { width: 180px; height: 180px; position: relative; }
+        #explore-grid .instrument-button img.main-img { width: 85%; height: 60%; object-fit: contain; pointer-events: none; }
+        #explore-grid .instrument-name { color: white; font-weight: bold; margin-top: 5px; text-shadow: 1px 1px 2px #000; }
         
-        .chest-container { min-height: 180px; background-size: contain; background-repeat: no-repeat; background-position: center; background-image: url('photosbox/box.png'); display: flex; justify-content: center; align-items: center; position: relative; }
+        .quiz-item { background: rgba(0, 0, 0, 0.5) !important; width: 150px !important; height: 150px !important; }
+        .quiz-item img { width: 90%; height: 90%; object-fit: contain; pointer-events: none; }
+
+        /* MATCH SECTION */
+        #match-section { background-image: url('photosbox/spilia.jpg') !important; background-size: cover; background-position: center; width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; position: fixed; top: 0; left: 0; z-index: 500; padding-top: 70px; }
+        .category-area { display: flex; width: 98%; height: 75%; gap: 10px; margin-top: 5px; }
+        #source-instruments { flex: 0.3; display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 15px; overflow-y: auto; align-content: flex-start; justify-content: center; }
+        
+        .target-containers { flex: 0.7; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 20px; }
+        
+        #match-section .instrument-button { 
+            width: 100px !important; 
+            height: 100px !important; 
+            padding: 8px !important; 
+            margin: 5px;
+        }
+        #match-section .instrument-button img { width: 100%; height: 100%; object-fit: contain; }
+
+        .chest-container { position: relative; cursor: pointer; background-size: contain; background-repeat: no-repeat; background-position: center; display: flex; justify-content: center; align-items: center; background-image: url('photosbox/box.png'); }
         .chest-container.open { background-image: url('photosbox/openbox.png') !important; }
-        .chest-content { display: none; width: 100%; height: 100%; position: absolute; flex-wrap: wrap; justify-content: center; padding-top: 40px; overflow-y: auto; }
+        
+        .chest-content { 
+            display: none; 
+            width: 100%; 
+            height: 100%; 
+            position: absolute; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+            justify-content: center; 
+            padding: 65px 15px 15px; 
+            overflow-y: auto; 
+        }
         .chest-container.open .chest-content { display: flex; }
 
-        /* UTILS */
+        .match-correct { border: 4px solid var(--success-color) !important; background: rgba(39, 174, 96, 0.7) !important; }
+        .match-wrong { border: 4px solid var(--error-color) !important; background: rgba(231, 76, 60, 0.7) !important; }
+
         .hidden { display: none !important; }
-        .match-correct { border: 3px solid var(--success-color) !important; background: rgba(39, 174, 96, 0.5) !important; }
-        .match-wrong { border: 3px solid var(--error-color) !important; background: rgba(231, 76, 60, 0.5) !important; }
-        .show-klik { opacity: 1 !important; transform: scale(1.1); }
-        .visible-app { display: flex !important; }
     </style>
 </head>
 <body>
 
-    <div id="selection-screen">
-        <img src="photos/logo.png" class="selection-logo">
-        <div class="selection-container">
-            <h2 style="margin-top:0;">Επιλέξτε Συσκευή</h2>
-            <button class="device-btn" onclick="startWithDevice('pc')">💻 PC</button>
-            <button class="device-btn" onclick="startWithDevice('laptop')">💻 Laptop</button>
-            <button class="device-btn" onclick="startWithDevice('mobile')">📱 Tablet / Mobile</button>
-        </div>
-    </div>
-
     <div id="splash-screen">
-        <video id="intro-video" playsinline>
+        <video id="intro-video" autoplay playsinline>
             <source src="instrument/Background.mp4" type="video/mp4">
         </video>
         <div class="logo-container">
@@ -146,23 +183,27 @@
         </div>
 
         <section id="explore-section">
-            <div id="explore-grid"></div>
+            <div id="explore-grid" style="display:flex; flex-wrap:wrap; justify-content:center; gap:15px; padding:15px;"></div>
+            <div id="video-explorer-container">
+                <button class="close-inline-video" onclick="closeInlineVideo()">✕ Κλείσιμο Βίντεο</button>
+                <iframe id="explorer-iframe" src="" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+            </div>
         </section>
 
         <section id="game-section" class="hidden">
-            <div style="color:white; text-align:center; padding:20px;">
+            <div style="color:white; text-align:center; padding:10px;">
                 <h2 style="margin:0;">Σκορ: <span id="quiz-score">0</span></h2>
-                <button class="nav-btn" style="margin-top:10px;" onclick="replayQuizSound()">Αναπαραγωγή Ήχου 🔊</button>
+                <button class="nav-btn" onclick="replayQuizSound()">Αναπαραγωγή Ήχου 🔊</button>
             </div>
             <div id="game-grid" style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px; padding:10px;"></div>
         </section>
 
         <section id="match-section" class="hidden">
             <div class="category-area">
-                <div id="source-instruments" style="flex:0.3; background:rgba(0,0,0,0.3); border-radius:15px; padding:10px; min-height:100px; display:flex; flex-wrap:wrap; justify-content:center; gap:5px;" ondragover="allow(event)" ondrop="dropToSource(event)"></div>
+                <div id="source-instruments" ondragover="allow(event)" ondrop="dropToSource(event)"></div>
                 <div class="target-containers" id="target-chests"></div>
             </div>
-            <div style="padding:20px; display:flex; gap:10px; justify-content:center;">
+            <div style="padding:10px; display:flex; gap:10px;">
                 <button class="nav-btn" style="background:var(--success-color); color:white;" onclick="checkMatch()">Έλεγχος ✅</button>
                 <button class="nav-btn" onclick="initMatch()">Επαναφορά 🔄</button>
             </div>
@@ -196,22 +237,27 @@
 
         const categories = { 'bowed': 'toxota.png', 'woodwind': 'xylina.png', 'brass': 'xalkina.png', 'plucked': 'nykta.png', 'melodic': 'melwdika.png', 'rhythmic': 'rythmika.png' };
         
-        let selectedDevice = "";
-        let currentQuizKey = "", score = 0, availableKeys = [], quizAudio = new Audio();
+        let currentQuizKey = "", score = 0;
+        let quizAudio = new Audio();
+        let availableKeys = []; 
 
-        // ΛΕΙΤΟΥΡΓΙΑ ΕΠΙΛΟΓΗΣ ΣΥΣΚΕΥΗΣ
-        function startWithDevice(device) {
-            selectedDevice = device;
-            document.getElementById('selection-screen').style.display = 'none';
-            document.getElementById('splash-screen').style.display = 'flex';
-            
+        window.addEventListener('load', () => {
             const video = document.getElementById('intro-video');
-            video.play().catch(e => console.log("Video wait click"));
-            
-            setTimeout(() => { 
-                document.getElementById('enter-app-button').classList.add('show-klik'); 
-            }, 2000);
-        }
+            video.muted = false;
+            let promise = video.play();
+            if (promise !== undefined) {
+                promise.catch(error => {
+                    window.addEventListener('click', () => {
+                        video.play();
+                        video.muted = false;
+                    }, { once: true });
+                });
+            }
+        });
+
+        setTimeout(() => { 
+            document.getElementById('enter-app-button').classList.add('show-klik'); 
+        }, 2000);
 
         function enterApp() { 
             const video = document.getElementById('intro-video');
@@ -221,7 +267,6 @@
             showSection('explore'); 
         }
 
-        // Η ΛΟΓΙΚΗ ΤΩΝ SECTIONS ΠΑΡΑΜΕΝΕΙ ΙΔΙΑ
         function showSection(id) {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -230,6 +275,9 @@
             document.getElementById(id + '-section').classList.remove('hidden');
             document.getElementById('btn-' + id).classList.add('active');
             
+            quizAudio.pause();
+            closeInlineVideo(); 
+
             if(id === 'explore') renderExplore();
             if(id === 'game') renderQuiz();
             if(id === 'match') initMatch();
@@ -239,32 +287,68 @@
             const g = document.getElementById('explore-grid'); g.innerHTML = '';
             Object.keys(instruments).forEach(k => {
                 g.innerHTML += `<div class="instrument-button">
-                    <img src="photos/${k}.png" style="width:75%; height:55%; object-fit:contain;">
+                    <img src="photos/${k}.png" class="main-img">
                     <div class="instrument-name">${instruments[k].name}</div>
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <img src="photos/i.png" style="width:30px; cursor:pointer;" onclick="window.open('${k}Info.html', '_blank')">
-                        <img src="photos/play.png" style="width:30px; cursor:pointer;" onclick="playVideo('${k}')">
+                    <div style="display:flex; gap:10px; margin-top:5px;">
+                        <img src="photos/i.png" style="width:35px; cursor:pointer;" onclick="window.open('${k}Info.html', '_blank')">
+                        <img src="photos/play.png" style="width:35px; cursor:pointer;" onclick="playInstrumentVideo('${k}')">
                     </div>
                 </div>`;
             });
         }
 
-        function playVideo(k) { alert("Αναπαραγωγή βίντεο για: " + instruments[k].name); }
+        function playInstrumentVideo(k) {
+            const videoContainer = document.getElementById('video-explorer-container');
+            const iframe = document.getElementById('explorer-iframe');
+            videoContainer.style.animation = 'none';
+            videoContainer.offsetHeight; 
+            videoContainer.style.animation = 'scaleUpLanding 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards';
+            iframe.src = `https://drive.google.com/file/d/${instruments[k].driveId}/preview`;
+            videoContainer.style.display = 'flex';
+            videoContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function closeInlineVideo() {
+            const videoContainer = document.getElementById('video-explorer-container');
+            const iframe = document.getElementById('explorer-iframe');
+            if(iframe) iframe.src = ""; 
+            if(videoContainer) videoContainer.style.display = 'none';
+        }
 
         function renderQuiz() {
-            const g = document.getElementById('game-grid'); g.innerHTML = '';
-            availableKeys = Object.keys(instruments); score = 0;
+            const g = document.getElementById('game-grid'); 
+            g.innerHTML = '';
+            availableKeys = Object.keys(instruments); 
+            score = 0;
             document.getElementById('quiz-score').innerText = score;
+
             Object.keys(instruments).sort(() => Math.random() - 0.5).forEach(k => {
-                const b = document.createElement('div'); b.className = 'instrument-button'; b.style.width = "120px";
-                b.innerHTML = `<img src="photos/${k}.png" style="width:90%;">`;
+                const b = document.createElement('div'); 
+                b.className = 'instrument-button quiz-item';
+                b.id = 'quiz-' + k;
+                b.innerHTML = `<img src="photos/${k}.png">`;
                 b.onclick = () => {
-                    if (k === currentQuizKey) {
-                        score++; document.getElementById('quiz-score').innerText = score;
+                    if (b.style.visibility === 'hidden' || b.classList.contains('match-correct')) return;
+
+                    if (k === currentQuizKey) { 
+                        score++; 
+                        document.getElementById('quiz-score').innerText = score;
                         b.classList.add('match-correct');
                         availableKeys = availableKeys.filter(key => key !== k);
-                        setTimeout(() => { b.style.visibility = 'hidden'; startQuizQuestion(); }, 800);
-                    } else { b.classList.add('match-wrong'); setTimeout(() => b.classList.remove('match-wrong'), 800); }
+                        
+                        setTimeout(() => {
+                            b.style.visibility = 'hidden';
+                            b.classList.remove('match-correct');
+                            if (availableKeys.length > 0) startQuizQuestion(); 
+                            else alert("Συγχαρητήρια! Τα βρήκες όλα!");
+                        }, 800);
+                    } else { 
+                        b.classList.add('match-wrong');
+                        setTimeout(() => {
+                            b.classList.remove('match-wrong');
+                            startQuizQuestion();
+                        }, 800);
+                    }
                 };
                 g.appendChild(b);
             });
@@ -273,28 +357,32 @@
 
         function startQuizQuestion() {
             if (availableKeys.length === 0) return;
-            currentQuizKey = availableKeys[Math.floor(Math.random() * availableKeys.length)];
+            const randomIndex = Math.floor(Math.random() * availableKeys.length);
+            currentQuizKey = availableKeys[randomIndex];
             quizAudio.src = `INSTRUMENTS/${currentQuizKey}.m4a`;
-            quizAudio.play();
+            quizAudio.play().catch(e => console.log("Audio blocked"));
         }
 
-        function replayQuizSound() { quizAudio.play(); }
+        function replayQuizSound() { quizAudio.currentTime = 0; quizAudio.play(); }
 
         function initMatch() {
             const src = document.getElementById('source-instruments'); src.innerHTML = '';
-            Object.keys(instruments).filter(k => k !== 'Piano').sort(() => Math.random() - 0.5).forEach(k => {
-                const d = document.createElement('div'); d.className = 'instrument-button'; d.style.width = "70px"; d.draggable = true; d.id = 'm-' + k;
-                d.innerHTML = `<img src="photos/${k}.png" style="width:100%;">`;
-                d.ondragstart = (e) => e.dataTransfer.setData('text', k);
-                src.appendChild(d);
-            });
+            Object.keys(instruments)
+                .filter(k => k !== 'Piano') 
+                .sort(() => Math.random() - 0.5)
+                .forEach(k => {
+                    const d = document.createElement('div'); d.className = 'instrument-button'; d.draggable = true; d.id = 'm-' + k;
+                    d.innerHTML = `<img src="photos/${k}.png">`;
+                    d.ondragstart = (e) => e.dataTransfer.setData('text', k);
+                    src.appendChild(d);
+                });
             const target = document.getElementById('target-chests'); target.innerHTML = '';
             Object.keys(categories).forEach(type => {
                 const chest = document.createElement('div'); chest.className = 'chest-container'; chest.style.backgroundImage = `url('photosbox/${categories[type]}')`;
                 const content = document.createElement('div'); content.className = 'chest-content'; content.dataset.type = type;
                 content.ondragover = (e) => e.preventDefault();
                 content.ondrop = (e) => { e.preventDefault(); const k = e.dataTransfer.getData('text'); content.appendChild(document.getElementById('m-' + k)); };
-                chest.onclick = () => chest.classList.toggle('open');
+                chest.onclick = (e) => { if (!e.target.closest('.instrument-button')) chest.classList.toggle('open'); };
                 chest.appendChild(content); target.appendChild(chest);
             });
         }
@@ -303,12 +391,14 @@
             document.querySelectorAll('.chest-container').forEach(c => c.classList.add('open'));
             document.querySelectorAll('.chest-content .instrument-button').forEach(item => {
                 const key = item.id.replace('m-', '');
-                if (instruments[key].type === item.parentElement.dataset.type) item.classList.add('match-correct');
+                const parentType = item.parentElement.dataset.type;
+                item.classList.remove('match-correct', 'match-wrong');
+                if (instruments[key].type === parentType) item.classList.add('match-correct');
                 else item.classList.add('match-wrong');
             });
         }
-        function allow(e) { e.preventDefault(); }
         function dropToSource(e) { e.preventDefault(); const k = e.dataTransfer.getData('text'); document.getElementById('source-instruments').appendChild(document.getElementById('m-' + k)); }
+        function allow(e) { e.preventDefault(); }
     </script>
 </body>
 </html>
